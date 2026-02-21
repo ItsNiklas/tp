@@ -8,6 +8,18 @@
 #include "d/actor/d_a_swTime.h"
 #include "d/d_procname.h"
 
+#if DEBUG
+class daSwTime_HIO_c : public mDoHIO_entry_c {
+public:
+    daSwTime_HIO_c() {}
+    virtual ~daSwTime_HIO_c() {}
+    void genMessage(JORMContext* ctx) {
+        ctx->genLabel("時刻制御スイッチ", 0, 0); // "Time control switch"
+    }
+};
+
+static daSwTime_HIO_c l_HIO;
+#endif
 
 int daSwTime_c::Create() {
     mTime = getTime();
@@ -21,22 +33,30 @@ int daSwTime_c::create() {
     if (!Create()) {
         return cPhs_ERROR_e;
     }
+
+#if DEBUG
+    l_HIO.entryHIO("時刻制御スイッチ"); // "Time control switch"
+#endif
+
     return cPhs_COMPLEATE_e;
 }
 
 int daSwTime_c::execute() {
-    if (mSwbit2 != 0xFF && !fopAcM_isSwitch(this,mSwbit2)) {
+    if (mSwbit2 != 0xFF && !fopAcM_isSwitch(this, mSwbit2)) {
         return 1;
     }
 
     if (dKy_getdaytime_hour() == mTime && dKy_getdaytime_minute() == 0) {
-        fopAcM_onSwitch(this,mSwbit);
+        fopAcM_onSwitch(this, mSwbit);
     }
 
     return 1;
 }
 
 int daSwTime_c::_delete() {
+#if DEBUG
+    l_HIO.removeHIO();
+#endif
     return 1;
 }
 
@@ -45,10 +65,12 @@ static int daSwTime_Execute(daSwTime_c* i_this) {
 }
 
 static int daSwTime_Delete(daSwTime_c* i_this) {
+    fpc_ProcID id = fopAcM_GetID(i_this);
     return i_this->_delete();
 }
 
 static int daSwTime_Create(daSwTime_c* i_this) {
+    fpc_ProcID id = fopAcM_GetID(i_this);
     return i_this->create();
 }
 
