@@ -1,12 +1,13 @@
 /**
-* @file d_a_obj_kiPot.cpp
+ * @file d_a_obj_kiPot.cpp
  *
  */
 
-#include "d/dolzel_rel.h" // IWYU pragma: keep
+#include "d/dolzel_rel.h"  // IWYU pragma: keep
 
 #include "d/actor/d_a_obj_kiPot.h"
 #include "d/d_com_inf_game.h"
+#include "d/d_s_play.h"
 
 static daKiPot_HIO_c l_HIO;
 
@@ -39,6 +40,10 @@ int daKiPot_c::create() {
     field_0x575 = 0;
     init_modeWait();
 
+#if DEBUG
+    l_HIO.entryHIO("キコル鍋中身");  // "Coro Pot Contents"
+#endif
+
     return cPhs_COMPLEATE_e;
 }
 
@@ -53,7 +58,7 @@ int daKiPot_c::Execute() {
 
 void daKiPot_c::procMain() {
     typedef void (daKiPot_c::*modeProcessFunc)();
-    static modeProcessFunc mode_proc[] = {
+    static const modeProcessFunc mode_proc[] = {
         &daKiPot_c::modeWait,
     };
 
@@ -66,7 +71,8 @@ void daKiPot_c::init_modeWait() {
 
 void daKiPot_c::modeWait() {
     if (chkEvent() && eventInfo.checkCommandCatch() == 0) {
-        dComIfGp_att_CatchRequest(this, fpcNm_ITEM_UGLY_SOUP, 100.0f, 50.0f, -50.0f, 0x2000, 1);
+        int res = dComIfGp_att_CatchRequest(this, fpcNm_ITEM_UGLY_SOUP, 100.0f + oREG_F(4), 50.0f,
+                                            -50.0f, 0x2000, 1);
         eventInfo.onCondition(dEvtCnd_40_e);
     }
 }
@@ -89,6 +95,9 @@ int daKiPot_c::Draw() {
 }
 
 int daKiPot_c::Delete() {
+#if DEBUG
+    l_HIO.removeHIO();
+#endif
     return 1;
 }
 
@@ -101,11 +110,14 @@ static int daKiPot_Execute(daKiPot_c* i_this) {
 }
 
 static int daKiPot_Delete(daKiPot_c* i_this) {
+    fpc_ProcID id = fopAcM_GetID(i_this);
     return i_this->Delete();
 }
 
-static int daKiPot_Create(fopAc_ac_c* i_this) {
-    return static_cast<daKiPot_c*>(i_this)->create();
+static int daKiPot_Create(fopAc_ac_c* actor) {
+    daKiPot_c* i_this = (daKiPot_c*)actor;
+    fpc_ProcID id = fopAcM_GetID(actor);
+    return i_this->create();
 }
 
 static actor_method_class l_daKiPot_Method = {

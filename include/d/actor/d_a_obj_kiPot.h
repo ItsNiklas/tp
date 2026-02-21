@@ -2,6 +2,7 @@
 #define D_A_OBJ_KIPOT_H
 
 #include "f_op/f_op_actor_mng.h"
+#include "d/d_com_inf_game.h"
 
 /**
  * @ingroup actors-objects
@@ -23,7 +24,6 @@ public:
     int Draw();
     int Delete();
 
-private:
     /* 0x568 */ u8 field_0x568[0x574 - 0x568];
     /* 0x574 */ u8 mMode;
     /* 0x575 */ u8 field_0x575;
@@ -37,7 +37,7 @@ public:
     daKiPot_HIO_c();
     virtual ~daKiPot_HIO_c() {};
 
-    void genMessage(JORMContext*);
+    void genMessage(JORMContext*) {};
 
     /* 0x00 */ /* vtable */
     /* 0x06 */ u8 field_0x06;
