@@ -63,11 +63,11 @@ public:
         mRoom[roomNo].reset();
     }
 
-    u32 getScale() { return fopAcM_GetParam(this) >> 0x1E; }
+    u8 getScale() { return fopAcM_GetParam(this) >> 0x1E; }
     u8 getArg1() { return (fopAcM_GetParam(this) >> 9) & 1; }
     u8 getArg0() { return (fopAcM_GetParam(this) >> 8) & 1; }
     u8 getSw() { return fopAcM_GetParam(this) & 0xFF; }
-    u8 getRoom() { return fopAcM_GetParam(this) >> 10; }
+    s8 getRoom() { return (fopAcM_GetParam(this) >> 10) & 0xFF; }
 
     static data_c mData[0x20];
     static room_c mRoom[0x40];

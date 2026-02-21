@@ -11,6 +11,8 @@
 int daSus_c::create() {
     s8 roomNo = fopAcM_GetRoomNo(this);
 
+    JUT_ASSERT(45, roomNo >= 0 || (0 <= getRoom() && getRoom() < 64));
+
     if (roomNo < 0) {
         roomNo = getRoom();
     }
@@ -29,7 +31,9 @@ int daSus_c::create() {
         scale.z *= 125.0f;
     }
 
-    newData(roomNo, current.pos, scale, sw, arg0, arg1);
+    if (!newData(roomNo, current.pos, scale, sw, arg0, arg1)) {
+        fopAcM_setWarningMessage(this, "d_a_suspend.cpp", 69, "Set Over !!");
+    }
     return cPhs_COMPLEATE_e;
 }
 
@@ -38,6 +42,7 @@ static int daSus_create(daSus_c* i_this) {
 
     return i_this->create();
 }
+
 static actor_method_class daSus_METHODS = {
     (process_method_func)daSus_create, NULL, NULL, NULL, NULL,
 };
